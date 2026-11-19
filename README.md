@@ -31,7 +31,7 @@ You ask AgentStrike. The bot launches a Cursor cloud agent, the central step, dr
 1. **You** tell AgentStrike which GitHub owner to look at, or you name one AI or agent app.
 2. **AgentStrike**, the Grok Bot, keeps the work inside the AI-only scope, saves your answers, and launches a single read-only run with the known leads. The report comes back here, and AgentStrike delivers it to you.
 3. **Cursor Cloud Agent** is the central step. It receives the prompt in [`prompts/cloud-agent-redteam-prompt.md`](prompts/cloud-agent-redteam-prompt.md), stays read-only, and does recon, the STRIDE and OWASP threat model, and the attack checks. It writes the report.
-4. **GitHub** is the read-only target. The only connection is the arrow labeled reads. The agent does not push, open a pull request, or open an issue.
+4. **GitHub** is the read-only target. The only connection is the arrow labeled “Reads the code.” The agent does not push, open a pull request, or open an issue.
 5. **Box browser** is the live-view branch off the cloud agent. AgentStrike opens the run there. In the Grok Bot app, open AgentStrike's Computer tab. The box browser there shows the cloud agent run page with its live commands.
 6. **Report** goes from the Cursor cloud agent to AgentStrike, then from AgentStrike to you. You get severity counts, tagged findings, evidence, payloads, fixes, controls that held, and a fix order. After you change the code, the same loop retests each id.
 
@@ -90,7 +90,7 @@ Cursor cloud agents have to be available on the same account. You do not start o
 | `skills/agentstrike-getting-started/SKILL.md` | The first conversation. |
 | `prompts/cloud-agent-redteam-prompt.md` | The prompt the cloud agent runs under. |
 | `templates/report-template.md` | Empty report shape. Every finding in it is an example placeholder. |
-| `assets/icon.svg` | Shield and crosshair mark. |
+| `assets/icon.svg` and `assets/icon.png` | Official mark: a red rounded blob with two white eyes. |
 | `assets/architecture.svg` and `assets/architecture.png` | The figure above. |
 | `scripts/build_architecture.py` | Rebuilds the figure. |
 

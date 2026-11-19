@@ -11,6 +11,7 @@ repos: a real image in the README, not a Mermaid block.
 """
 from __future__ import annotations
 
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -19,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT_SVG = ROOT / "assets" / "architecture.svg"
 OUT_PNG = ROOT / "assets" / "architecture.png"
 
-W, H = 1240, 560
+W, H = 1380, 620
 RED = "#E11D48"
 LINE = "#9AA0A6"
 PANEL = "#F7F8F9"
@@ -28,7 +29,7 @@ ACCENT_BOX = "#FFF4E8"
 ACCENT_EDGE = "#F3D5B0"
 ACCENT_TEXT = "#C2410C"
 INK = "#1F2328"
-MUTED = "#5B616A"
+MUTED = "#3A4150"
 
 GITHUB_PATH = (
     "M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 "
@@ -48,10 +49,10 @@ CURSOR_PATH = (
     "0 0 0-.295-.51l-9.11-5.257c-.109-.063-.064-.23.061-.23"
 )
 
-YOU_X, BOT_X, CLOUD_X, GH_X = 170, 450, 760, 1060
-MAIN_Y = 196
-BROWSER_Y = 430
-REPORT_Y = 430
+YOU_X, BOT_X, CLOUD_X, GH_X = 200, 530, 880, 1200
+MAIN_Y = 214
+BROWSER_Y = 500
+REPORT_Y = 500
 
 
 def arrow_defs() -> str:
@@ -66,10 +67,10 @@ def style() -> str:
     return f'''<style>
     text {{ font-family: ui-sans-serif, Inter, system-ui, -apple-system, "Segoe UI", sans-serif; fill: {INK}; }}
     .title {{ font-size: 28px; font-weight: 700; }}
-    .name {{ font-size: 15px; font-weight: 700; }}
-    .cap {{ font-size: 13px; fill: {MUTED}; }}
-    .note {{ font-size: 13px; fill: {MUTED}; }}
-    .phase {{ font-size: 12.5px; fill: {MUTED}; }}
+    .name {{ font-size: 16px; font-weight: 700; }}
+    .cap {{ font-size: 14.5px; fill: {MUTED}; }}
+    .note {{ font-size: 14.5px; fill: {MUTED}; font-weight: 600; }}
+    .phase {{ font-size: 14.5px; fill: {MUTED}; font-weight: 600; }}
   </style>'''
 
 
@@ -85,10 +86,10 @@ def badge(x: float, y: float, n: str) -> str:
 
 
 def labels_above(x: float, y: float, r: float, name: str, cap: str) -> str:
-    # Caption baseline sits 18px above the circle so descenders stay clear of the disk.
+    # Caption baseline sits clear of the circle.
     return (
-        f'<text class="name" x="{x}" y="{y - r - 40}" text-anchor="middle">{name}</text>'
-        f'<text class="cap" x="{x}" y="{y - r - 20}" text-anchor="middle">{cap}</text>'
+        f'<text class="name" x="{x}" y="{y - r - 46}" text-anchor="middle">{name}</text>'
+        f'<text class="cap" x="{x}" y="{y - r - 24}" text-anchor="middle">{cap}</text>'
     )
 
 
@@ -114,13 +115,17 @@ def person(x: float, y: float) -> str:
   </g>'''
 
 
-def shield(x: float, y: float) -> str:
-    return f'''<g transform="translate({x},{y})">
-    <path fill="{RED}" d="M0-20 18-12.6v11.4C18 8.4 10.6 15.4 0 18.6-10.6 15.4-18 8.4-18-1.2v-11.4z"/>
-    <circle cx="0" cy="0" r="5.6" fill="none" stroke="#fff" stroke-width="1.7"/>
-    <path d="M0-9v18M-9 0h18" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/>
-    <circle cx="0" cy="0" r="1.5" fill="#fff"/>
-  </g>'''
+def bot_icon(x: float, y: float, size: float = 46) -> str:
+    """Official mark from assets/icon.svg, scaled to fit the node circle."""
+    raw = (ROOT / "assets" / "icon.svg").read_text()
+    raw = re.sub(r"<svg[^>]*>", "", raw, count=1)
+    raw = raw.replace("</svg>", "")
+    scale = size / 64
+    return (
+        f'<g transform="translate({x},{y})">'
+        f'<g transform="translate({-size / 2:.2f},{-size / 2:.2f}) scale({scale:.4f})">{raw}</g>'
+        f"</g>"
+    )
 
 
 def brand(x: float, y: float, path: str, size: float) -> str:
@@ -159,45 +164,51 @@ def report_icon(x: float, y: float) -> str:
 
 def build() -> str:
     cloud_r, node_r, report_r = 46, 36, 32
-    phase_y = MAIN_Y + cloud_r + 26
-    deliver_y = MAIN_Y + node_r + 36
-    # Starts inside the cloud circle's lower-left so the disk covers the end
-    # and the visible line leaves the bottom edge, left of the live-view stem.
-    rim_x, rim_y = 756, 238
-    # Drop in the gap between AgentStrike and the phase label, then into the report.
-    drop_x = 590
+    phase_y = MAIN_Y + cloud_r + 36
+    deliver_y = MAIN_Y + node_r + 40
+    # Leave the cloud circle at its lower-left edge, under the forward arrow.
+    rim_x, rim_y = CLOUD_X - 4, MAIN_Y + 42
+    drop_x = CLOUD_X - 180
+    ask_x = (YOU_X + node_r + BOT_X - node_r) / 2
+    start_x = (BOT_X + node_r + CLOUD_X - cloud_r) / 2
+    read_x = (CLOUD_X + cloud_r + GH_X - node_r) / 2
     parts = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="How AgentStrike works">',
         f'<rect width="{W}" height="{H}" fill="#FFFFFF"/>',
         arrow_defs(),
         style(),
-        f'<text class="title" x="{W / 2}" y="44" text-anchor="middle">How AgentStrike works</text>',
+        f'<text class="title" x="{W / 2}" y="46" text-anchor="middle">How AgentStrike works</text>',
         # You -> AgentStrike -> Cursor Cloud Agent.
         line(YOU_X + node_r + 8, MAIN_Y, BOT_X - node_r - 10, MAIN_Y),
         line(BOT_X + node_r + 8, MAIN_Y, CLOUD_X - cloud_r - 10, MAIN_Y),
         # One read-only arrow into GitHub.
         line(CLOUD_X + cloud_r + 8, MAIN_Y, GH_X - node_r - 10, MAIN_Y),
-        f'<text class="note" x="{(CLOUD_X + cloud_r + GH_X - node_r) / 2}" y="{MAIN_Y - 14}" text-anchor="middle">reads</text>',
-        # Phase line sits under the cloud-agent circle. The live-view arrow starts below it.
-        f'<text class="phase" x="{CLOUD_X}" y="{phase_y}" text-anchor="middle">Recon · STRIDE/OWASP · Attack</text>',
-        line(CLOUD_X, phase_y + 12, CLOUD_X, BROWSER_Y - node_r - 10),
-        f'<text class="note" x="{CLOUD_X + 52}" y="{(phase_y + BROWSER_Y) / 2}">Live view</text>',
-        # Cloud agent -> report, from the circle's bottom edge, then straight up to AgentStrike.
+        f'<text class="note" x="{ask_x}" y="{MAIN_Y - 16}" text-anchor="middle">Asks for a review</text>',
+        f'<text class="note" x="{start_x}" y="{MAIN_Y - 16}" text-anchor="middle">Starts the run</text>',
+        f'<text class="note" x="{read_x}" y="{MAIN_Y - 16}" text-anchor="middle">Reads the code</text>',
+        # What the cloud agent checks, under the circle. Live view continues below that line.
+        f'<text class="phase" x="{CLOUD_X}" y="{phase_y}" text-anchor="middle">Security checks: STRIDE + OWASP</text>',
+        line(CLOUD_X, phase_y + 14, CLOUD_X, BROWSER_Y - node_r - 12),
+        f'<text class="note" x="{CLOUD_X + 18}" y="{(phase_y + 14 + BROWSER_Y - node_r) / 2 + 4}">Shows the live run</text>',
+        # Cloud agent writes the report, then AgentStrike sends it up and delivers it to you.
         line(rim_x, rim_y, drop_x, rim_y, head=False),
         line(drop_x, rim_y, drop_x, REPORT_Y, head=False),
         line(drop_x - 4, REPORT_Y, BOT_X + report_r + 14, REPORT_Y),
         line(BOT_X, REPORT_Y - report_r - 8, BOT_X, MAIN_Y + node_r + 8),
+        f'<text class="note" x="{(drop_x + BOT_X) / 2 + 10}" y="{REPORT_Y - 16}" text-anchor="middle">Writes the findings</text>',
+        f'<text class="note" x="{BOT_X + 16}" y="{(REPORT_Y + MAIN_Y) / 2 - 20}">Sends the findings</text>',
         # AgentStrike delivers the report to you, below the forward arrow.
         line(BOT_X - 20, MAIN_Y + 30, BOT_X - 20, deliver_y, head=False),
         line(BOT_X - 20, deliver_y, YOU_X + 24, deliver_y, head=False),
         line(YOU_X + 24, deliver_y, YOU_X + 24, MAIN_Y + 27),
+        f'<text class="note" x="{(YOU_X + BOT_X) / 2}" y="{deliver_y - 12}" text-anchor="middle">Delivers the report</text>',
     ]
 
     nodes = [
-        (YOU_X, MAIN_Y, node_r, "1", "You", "Owner", lambda x, y: person(x, y)),
-        (BOT_X, MAIN_Y, node_r, "2", "AgentStrike", "Grok Bot", lambda x, y: shield(x, y)),
-        (CLOUD_X, MAIN_Y, cloud_r, "3", "Cursor Cloud Agent", "Read-only run", lambda x, y: brand(x, y, CURSOR_PATH, 40)),
-        (GH_X, MAIN_Y, node_r, "4", "GitHub", "Target repo", lambda x, y: brand(x, y, GITHUB_PATH, 34)),
+        (YOU_X, MAIN_Y, node_r, "1", "You", "Picks the target, reads the report", lambda x, y: person(x, y)),
+        (BOT_X, MAIN_Y, node_r, "2", "AgentStrike", "Starts a run on one AI app", lambda x, y: bot_icon(x, y, 46)),
+        (CLOUD_X, MAIN_Y, cloud_r, "3", "Cursor Cloud Agent", "Read-only security review", lambda x, y: brand(x, y, CURSOR_PATH, 40)),
+        (GH_X, MAIN_Y, node_r, "4", "GitHub", "Repository for the AI app", lambda x, y: brand(x, y, GITHUB_PATH, 34)),
     ]
     for x, y, r, n, name, cap, draw in nodes:
         parts.append(disk(x, y, r))
@@ -208,12 +219,12 @@ def build() -> str:
 
     parts.append(disk(CLOUD_X, BROWSER_Y, node_r))
     parts.append(browser(CLOUD_X, BROWSER_Y))
-    parts.append(labels_below(CLOUD_X, BROWSER_Y, node_r, "Box browser", "Computer tab in Grok Bot"))
+    parts.append(labels_below(CLOUD_X, BROWSER_Y, node_r, "Box browser", "Live view in the Computer tab"))
     parts.append(badge(CLOUD_X + node_r + 16, BROWSER_Y - node_r + 8, "5"))
 
     parts.append(disk(BOT_X, REPORT_Y, report_r))
     parts.append(report_icon(BOT_X, REPORT_Y))
-    parts.append(labels_below(BOT_X, REPORT_Y, report_r, "Report", "Ranked findings"))
+    parts.append(labels_below(BOT_X, REPORT_Y, report_r, "Report", "Ranked findings and fixes"))
     parts.append(badge(BOT_X - report_r - 16, REPORT_Y - 4, "6"))
 
     parts.append("</svg>")
