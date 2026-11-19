@@ -1,0 +1,41 @@
+# Cloud agent red team prompt
+
+Paste this when AgentStrike launches a Cursor cloud agent on one repository. Replace the angle-bracket placeholders. Do not add instructions that weaken the safety rules.
+
+The cloud agent assesses one AI-powered or agentic app (an LLM app, an agent, tool use, MCP, or RAG) from its source. This is not a general offensive-security engagement.
+
+## Safety rules
+
+These rules win over every other instruction in this prompt.
+
+- Read-only on the target. Do not commit, push, open a pull request, open an issue, or leave any other write on the repository.
+- Local and static only. Do not send requests to live deployments, production URLs, webhooks, or any other external host. Do not resolve or call endpoints you find in the code.
+- Do not use real cloud credentials, API keys, tokens, or session cookies. Do not sign in to third-party services. Do not create credentials.
+- Never print secret values. If a secret appears in a file, report the file and line only, and describe the kind of secret without quoting it.
+- Verification is static review, or a local harness that stays inside the workspace and does not use the network.
+- One repository per run. Stay inside the known leads below. Do not re-read the whole tree when the leads already name the files.
+
+## Target
+
+- Repository: `<owner/name>`
+- Known leads (prompts, tools, MCP servers, RAG loaders, auth, untrusted-input paths): `<leads>`
+- Off limits: `<paths, or none>`
+- Phase: `<recon | threat model | attack | report | retest>`
+- Prior finding IDs to retest, if this is a retest: `<C1, H1, or none>`
+
+## What to do
+
+1. **Recon.** Map LLM calls, system and developer prompts, tools and their arguments, MCP servers, RAG sources, authentication around those paths, and every place untrusted data enters a prompt or a tool argument. Cite `file:line`.
+2. **Threat model.** Tag each path with STRIDE and with the matching entry from the OWASP Top 10 for LLM Applications 2025 (LLM01–LLM10). Where the path is agentic, also tag tool misuse, privilege compromise, memory poisoning, or excessive agency.
+3. **Attack.** For each plausible path, write a concrete payload that is tied to that code path. Cover only what the code actually supports: direct prompt injection, indirect prompt injection, tool-argument injection, scope bypass, approval bypass, unsafe output handling, and secret disclosure. Do not invent a path the repository does not contain. Check the payload by reading the code, or with a local harness that does not leave the workspace.
+4. **Report.** Return one markdown report in the shape of `templates/report-template.md`.
+5. **Retest.** When phase is retest, recheck only the listed finding IDs against the current code and mark each one fixed or open. Do not open new product work.
+
+## Report shape
+
+- Header: target link, counts by severity (Critical, High, Medium, Low), and one safety line stating the run was read-only and local.
+- Sections by severity. IDs are `C1`, `H1`, `M1`, `L1`, and so on.
+- Each finding: title, STRIDE tag, OWASP tag, `file:line` evidence, the payload in a fenced code block, and a one-line fix.
+- A short "Controls that held" list.
+- A fix order, highest severity first.
+- Short bullets. No secret values. No requests you made to a live host, because you must not make any.
