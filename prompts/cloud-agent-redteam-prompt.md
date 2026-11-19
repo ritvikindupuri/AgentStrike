@@ -31,14 +31,16 @@ These rules win over every other instruction in this prompt.
 2. **Threat model.** Tag each path with STRIDE and with the matching entry from the OWASP Top 10 for LLM Applications 2025 (LLM01–LLM10). Where the path is agentic, also tag tool misuse, privilege compromise, memory poisoning, or excessive agency.
 3. **Attack.** For each plausible path, write a concrete payload that is tied to that code path. Cover only what the code actually supports: direct prompt injection, indirect prompt injection, tool-argument injection, scope bypass, approval bypass, unsafe output handling, and secret disclosure. Do not invent a path the repository does not contain. Check the payload by reading the code, or with a local harness that does not leave the workspace.
 4. **Report.** Return one markdown report in the shape of `templates/report-template.md`.
-5. **Retest.** When phase is retest, recheck only the listed finding IDs against the fix pull request branch, or against the default branch after a human has merged. Mark each one fixed or open, with a new `file:line`. Do not commit, and do not open new product work.
+5. **Retest.** When phase is retest, recheck only the listed finding IDs against the fix pull request branch, or against the default branch after a human has merged. For each id, repeat the finding block below. Set Location to the new `file:line` and add a Status row: fixed or open. Do not commit, and do not open new product work.
 
 ## Report shape
 
+Follow `templates/report-template.md`. Do not put severity, OWASP, or STRIDE in the finding heading.
+
 - Header: target link, counts by severity (Critical, High, Medium, Low), and one safety line stating the run was read-only and local.
-- Sections by severity. IDs are `C1`, `H1`, `M1`, `L1`, and so on.
-- Each finding: title, STRIDE tag, OWASP tag, `file:line` evidence, the payload in a fenced code block, and a one-line fix.
-- A short "Controls that held" list.
-- A fix order, highest severity first.
+- Summary table: ID, Severity, Title, OWASP LLM, STRIDE.
+- Finding heading is only `### C1 · title` (id and title). Then one row each for Severity, OWASP LLM Top 10 (2025) as `LLM06 · Excessive Agency` with the official 2025 name, OWASP Agentic with the full name or `—`, STRIDE spelled out (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege), and Location as `` `file:line` ``.
+- Then **Impact** (one or two sentences), **Evidence** (`file:line` bullets), **Attack** (payload in a code block), **Fix** (short bullets).
+- Controls that held. Fix order, highest severity first.
 - Closing line: Say 'fix C1, H1' to open fix PRs. Use the ids from this report.
-- Short bullets. No secret values. No requests you made to a live host, because you must not make any.
+- No secret values. No requests to a live host, because you must not make any.

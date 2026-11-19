@@ -24,11 +24,11 @@ These rules win over every other instruction in this prompt.
 - Findings to fix: `<C1, H1>`
 - Base branch: `<branch the pull request should target>`
 - How to group the pull requests: `<one PR per finding | one PR per severity group>`
-- Finding notes (id, file:line, payload, one-line fix): `<paste from the report>`
+- Finding notes (id, title, location, payload, fix): `<paste from the report>`
 
 ## What to do
 
-1. Read each named finding. Use its `file:line`, payload, and one-line fix. Do not invent a finding that is not in the list.
+1. Read each named finding. Use its id, title, Location, Attack payload, and Fix. Cite it as `H1 · title`, not as one line of severity plus tags. Do not invent a finding that is not in the list.
 2. Create a new branch from the base branch. Name it for the finding, for example `fix/c1-short-slug`. For a severity group, name the branch for that group.
 3. Make the smallest change that closes that finding.
 4. Add a regression test or a local harness. Run it. The original payload must fail closed: the unsafe behavior must not happen.
