@@ -101,6 +101,14 @@ def labels_below(x: float, y: float, r: float, name: str, cap: str) -> str:
     )
 
 
+def dashed_path(points: list[tuple[float, float]]) -> str:
+    d = "M " + " L ".join(f"{x:.1f} {y:.1f}" for x, y in points)
+    return (
+        f'<path d="{d}" fill="none" stroke="{LINE}" stroke-width="1.8" '
+        f'stroke-dasharray="6 5" stroke-linejoin="round" marker-end="url(#arrow)"/>'
+    )
+
+
 def line(x1, y1, x2, y2, head: bool = True, dashed: bool = False) -> str:
     marker = ' marker-end="url(#arrow)"' if head else ""
     dash = ' stroke-dasharray="6 5"' if dashed else ""
@@ -166,7 +174,8 @@ def report_icon(x: float, y: float) -> str:
 
 def build() -> str:
     cloud_r, node_r, report_r = 46, 36, 32
-    phase_y = MAIN_Y + cloud_r + 36
+    # Below the dashed fix path, which runs under the read arrow.
+    phase_y = MAIN_Y + cloud_r + 52
     deliver_y = MAIN_Y + node_r + 40
     # Leave the cloud circle at its lower-left edge, under the forward arrow.
     rim_x, rim_y = CLOUD_X - 4, MAIN_Y + 42
@@ -176,10 +185,23 @@ def build() -> str:
     ask_x = (YOU_X + node_r + BOT_X - node_r) / 2
     start_x = (BOT_X + node_r + CLOUD_X - cloud_r) / 2
     read_x = (CLOUD_X + cloud_r + GH_X - node_r) / 2
-    fix_y = MAIN_Y + 30
-    fix_dy = fix_y - MAIN_Y
-    fix_x1 = CLOUD_X + math.sqrt(cloud_r ** 2 - fix_dy ** 2) + 3
-    fix_x2 = GH_X - math.sqrt(node_r ** 2 - fix_dy ** 2) - 3
+    # Leave the cloud circle low, run well under "Reads the code", then
+    # angle up into the lower edge of the GitHub circle.
+    leave = math.radians(58)
+    fix_x1 = CLOUD_X + cloud_r * math.cos(leave) + 2
+    fix_y1 = MAIN_Y + cloud_r * math.sin(leave) + 1
+    low_y = MAIN_Y + 64
+    fix_x_low = CLOUD_X + cloud_r + 16
+    arrive = math.radians(112)
+    fix_x2 = GH_X + node_r * math.cos(arrive) - 1
+    fix_y2 = MAIN_Y + node_r * math.sin(arrive)
+    bend_x = fix_x2 - 56
+    fix_points = [
+        (fix_x1, fix_y1),
+        (fix_x_low, low_y),
+        (bend_x, low_y),
+        (fix_x2, fix_y2),
+    ]
     parts = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="How AgentStrike works">',
         f'<rect width="{W}" height="{H}" fill="#FFFFFF"/>',
@@ -191,12 +213,11 @@ def build() -> str:
         line(BOT_X + node_r + 8, MAIN_Y, CLOUD_X - cloud_r - 10, MAIN_Y),
         # Solid read-only arrow, then a dashed opt-in fix arrow below it.
         line(CLOUD_X + cloud_r + 8, MAIN_Y, GH_X - node_r - 10, MAIN_Y),
-        line(fix_x1, fix_y, fix_x2, fix_y, dashed=True),
+        dashed_path(fix_points),
         f'<text class="note" x="{ask_x}" y="{MAIN_Y - 16}" text-anchor="middle">Asks for a review</text>',
         f'<text class="note" x="{start_x}" y="{MAIN_Y - 16}" text-anchor="middle">Starts the run</text>',
         f'<text class="note" x="{read_x}" y="{MAIN_Y - 16}" text-anchor="middle">Reads the code</text>',
-        # Sit the label under the dashes, clear of the phase line on the left.
-        f'<text class="note" x="{(fix_x1 + fix_x2) / 2 + 24}" y="{fix_y + 40}" text-anchor="middle">Opens a fix PR (only if you ask)</text>',
+        f'<text class="note" x="{(fix_x_low + bend_x) / 2}" y="{low_y - 20}" text-anchor="middle">Opens a fix PR (only if you ask)</text>',
         # What the cloud agent checks, under the circle. Live view continues below that line.
         f'<text class="phase" x="{CLOUD_X}" y="{phase_y}" text-anchor="middle">Security checks: STRIDE + OWASP</text>',
         line(CLOUD_X, phase_y + 14, CLOUD_X, BROWSER_Y - node_r - 12),
@@ -219,7 +240,7 @@ def build() -> str:
     nodes = [
         (YOU_X, MAIN_Y, node_r, "1", "You", "Picks the target, reads the report", lambda x, y: person(x, y)),
         (BOT_X, MAIN_Y, node_r, "2", "AgentStrike", "Starts a run on one AI app", lambda x, y: bot_icon(x, y, 46)),
-        (CLOUD_X, MAIN_Y, cloud_r, "3", "Cursor Cloud Agent", "Read-only security review", lambda x, y: brand(x, y, CURSOR_PATH, 40)),
+        (CLOUD_X, MAIN_Y, cloud_r, "3", "Cursor Cloud Agent", "Security review, read-only by default", lambda x, y: brand(x, y, CURSOR_PATH, 40)),
         (GH_X, MAIN_Y, node_r, "4", "GitHub", "Repository for the AI app", lambda x, y: brand(x, y, GITHUB_PATH, 34)),
     ]
     for x, y, r, n, name, cap, draw in nodes:
