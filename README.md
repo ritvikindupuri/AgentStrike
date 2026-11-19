@@ -6,9 +6,9 @@ AgentStrike is a Grok Bot (an AI assistant built on the Grok Bot app, by Cursor)
 
 It does not do general offensive security. A run never commits, opens a pull request, or opens an issue on the target. It never calls a live deployment or any other external host, never uses real cloud credentials, and never prints a secret value. When a check needs a concrete payload, that payload is tied to a code path and checked by reading the code or with a local harness that stays inside the workspace.
 
-The bot launches one Cursor cloud agent on the repository you pick, opens that run in its box browser so you can watch the commands on the Computer tab, and returns a severity-ranked markdown report. Findings use ids such as C1, H1, M1, and L1, with STRIDE and OWASP tags, `file:line` evidence, the payload in a code block, and a one-line fix. The report also lists controls that held and a fix order.
+The bot launches one Cursor cloud agent on the repository you pick. In the Grok Bot app, open AgentStrike's Computer tab. The box browser there shows the cloud agent run page with its live commands. The bot returns a severity-ranked markdown report. Findings use ids such as C1, H1, M1, and L1, with STRIDE and OWASP tags, `file:line` evidence, the payload in a code block, and a one-line fix. The report also lists controls that held and a fix order.
 
-This repository is the public template: the bot profile, four memories, two skills, the cloud-agent prompt, and an empty report skeleton. Import it, or recreate it by hand from the files below.
+This repository is the recipe for that bot: the profile, four memories, two skills, the cloud-agent prompt, and an empty report skeleton. [`template/agentstrike-template.json`](template/agentstrike-template.json) is the recipe reference. Open the AgentStrike Bot template link, or create the bot by hand from these files.
 
 ## Key features
 
@@ -17,7 +17,7 @@ This repository is the public template: the bot profile, four memories, two skil
 - **Read-only on the target.** No commits, pull requests, or issues. You merge your own fixes.
 - **Local only.** No live hosts, no real cloud credentials, and secret values are never printed. The report names the file and line.
 - **One target at a time.** The cloud agent gets the known leads, so it does not re-read the whole tree.
-- **Live view.** The run opens in the box browser. You watch commands on the Computer tab.
+- **Live view.** In the Grok Bot app, open AgentStrike's Computer tab. The box browser there shows the cloud agent run page with its live commands.
 - **One report shape.** Severity sections, tags, evidence, payloads, one-line fixes, controls that held, and a fix order.
 - **A public template.** Profile, memories, skills, and a getting-started skill. No routines and no plugins.
 
@@ -26,23 +26,21 @@ This repository is the public template: the bot profile, four memories, two skil
 <p align="center">
   <img src="assets/architecture.png" alt="How AgentStrike works" width="900">
 </p>
-<p align="center"><b>Figure 1. How AgentStrike works</b></p>
-
-You ask AgentStrike. The bot launches a Cursor cloud agent, which is the central step and uses the Cursor logo in the figure. That agent reads the GitHub repository. A live view branches off the cloud agent into the box browser. The report flows back to you.
+You ask AgentStrike. The bot launches a Cursor cloud agent, the central step, drawn with the Cursor logo. That agent reads the GitHub repository. It writes the report and sends it to AgentStrike, and AgentStrike delivers it to you. AgentStrike opens the run in the box browser.
 
 1. **You** tell AgentStrike which GitHub owner to look at, or you name one AI or agent app.
-2. **AgentStrike**, the Grok Bot, keeps the work inside the AI-only scope, saves your answers, and launches a single read-only run with the known leads.
-3. **Cursor Cloud Agent** is the central step. It receives the prompt in [`prompts/cloud-agent-redteam-prompt.md`](prompts/cloud-agent-redteam-prompt.md), stays read-only, and does recon, the threat model, and the checks.
-4. **GitHub** is the target repository. The agent reads it. It does not push, open a pull request, or open an issue.
-5. **Box browser** is the live-view branch. As soon as the run exists, the bot opens it so you can watch the Computer tab. The branch is only a window onto the same run.
-6. **Report** flows back. You get severity counts, tagged findings, evidence, payloads, fixes, controls that held, and a fix order. After you change the code, the same loop retests each id.
+2. **AgentStrike**, the Grok Bot, keeps the work inside the AI-only scope, saves your answers, and launches a single read-only run with the known leads. The report comes back here, and AgentStrike delivers it to you.
+3. **Cursor Cloud Agent** is the central step. It receives the prompt in [`prompts/cloud-agent-redteam-prompt.md`](prompts/cloud-agent-redteam-prompt.md), stays read-only, and does recon, the STRIDE and OWASP threat model, and the attack checks. It writes the report.
+4. **GitHub** is the read-only target. The only connection is the arrow labeled reads. The agent does not push, open a pull request, or open an issue.
+5. **Box browser** is the live-view branch off the cloud agent. AgentStrike opens the run there. In the Grok Bot app, open AgentStrike's Computer tab. The box browser there shows the cloud agent run page with its live commands.
+6. **Report** goes from the Cursor cloud agent to AgentStrike, then from AgentStrike to you. You get severity counts, tagged findings, evidence, payloads, fixes, controls that held, and a fix order. After you change the code, the same loop retests each id.
 
 ## Tech stack
 
 - **Grok Bot app.** The bot profile, memories, skills, the getting-started skill, and the box browser.
 - **Cursor cloud agents.** One read-only run per target. The prompt they receive is in this repo.
 - **GitHub.** The inventory of your repositories, and the source the cloud agent reads.
-- **Box desktop browser.** The live run, with commands on the Computer tab.
+- **Box desktop browser.** In the Grok Bot app, AgentStrike's Computer tab shows this browser. The page in it is the cloud agent run, with its live commands.
 - **STRIDE.** Spoofing, tampering, repudiation, information disclosure, denial of service, elevation of privilege.
 - **OWASP Top 10 for LLM Applications 2025.** LLM01 Prompt Injection, LLM02 Sensitive Information Disclosure, LLM03 Supply Chain, LLM04 Data and Model Poisoning, LLM05 Improper Output Handling, LLM06 Excessive Agency, LLM07 System Prompt Leakage, LLM08 Vector and Embedding Weaknesses, LLM09 Misinformation, LLM10 Unbounded Consumption.
 - **OWASP Agentic threats used here.** Tool misuse, privilege compromise, memory poisoning, and excessive agency.
@@ -61,11 +59,11 @@ cd AgentStrike
 
 ### 2. Create the bot from the template
 
-The recipe is [`template/agentstrike-template.json`](template/agentstrike-template.json). It sets the profile name and description, the four memories, both skills, and `gettingStarted` to `agentstrike-getting-started`. Routines and plugins are empty.
+Grok Bot shares bots as a Bot template link, not as a JSON file import. [`template/agentstrike-template.json`](template/agentstrike-template.json) is the recipe reference. It records the profile name and description, the four memories, both skills, and `gettingStarted` set to `agentstrike-getting-started`. Routines and plugins are empty.
 
-If your Grok Bot app offers a template import, import that file.
+Open the AgentStrike Bot template link if you have one. The bot's getting-started skill runs on the first chat.
 
-If it does not, create a bot by hand and match the file:
+Otherwise, create a new bot by hand and add the memories and skills from this repo:
 
 1. Name the bot **AgentStrike**.
 2. Paste the profile description from the JSON.
@@ -98,7 +96,7 @@ Cursor cloud agents have to be available on the same account. You do not start o
 
 ## Usage guide
 
-The interaction is the chat, plus two places you look: the GitHub connection card, and the Computer tab of the live run. The steps below are the whole loop, from the first question to sharing the template.
+The interaction is the chat, plus two places you look: the GitHub connection card, and AgentStrike's Computer tab in the Grok Bot app. The steps below are the whole loop, from the first question to sharing the template.
 
 ### 1. First conversation
 
@@ -162,12 +160,11 @@ Phases on that run:
 
 ### 6. Watch the Computer tab
 
-When the run starts, the bot opens it in the box browser. That is the live-view branch in the figure.
+When the run starts, AgentStrike opens it in the box browser. That is the live-view branch in the figure.
 
-1. Bring the box browser forward. The page is the cloud agent run the bot just opened.
-2. Open the **Computer** tab on that run.
-3. Watch the commands as they run. You should see reads of the target repo, not pushes, and not requests to a deployed URL.
-4. If a command is heading at a live host, an external service, or a write to the repo, stop the run in that cloud-agent page and tell the bot: `Stop. That run tried to leave the repo. Start it again read-only.`
+1. In the Grok Bot app, open AgentStrike's Computer tab. The box browser there shows the cloud agent run page with its live commands.
+2. Watch the commands as they run. You should see reads of the target repo, not pushes, and not requests to a deployed URL.
+3. If a command is heading at a live host, an external service, or a write to the repo, stop the run on that page and tell the bot: `Stop. That run tried to leave the repo. Start it again read-only.`
 
 You can say `No live view` on a later run if you do not want the browser opened. The assessment still returns the report.
 
@@ -206,10 +203,10 @@ The off-limits list still applies. Live view still follows the preference you sa
 
 ### 10. Share the template
 
-The public copy of AgentStrike is this repository. To hand it to someone else, send:
+In AgentStrike's chat, ask:
 
-`https://github.com/ritvikindupuri/AgentStrike`
+`give me your bot template`
 
-They clone it and follow the setup above. The file they import, if their app accepts a template file, is `template/agentstrike-template.json`.
+It packs a shareable Bot template, which you confirm and publish.
 
-If your Grok Bot app shows a share or export action for a bot, you can use that too. The repository stays the copy that includes the prompt, the report skeleton, and the skills as separate files. Do not put real findings, secret values, or personal data into the template when you share it.
+[`template/agentstrike-template.json`](template/agentstrike-template.json) is the recipe reference for what that template contains. Do not put real findings, secret values, or personal data into the template when you share it.

@@ -2,9 +2,9 @@
 """Build assets/architecture.svg and assets/architecture.png.
 
 Flow, left to right, with the Cursor cloud agent as the central step:
-You -> AgentStrike -> Cursor Cloud Agent -> GitHub target repo.
+You -> AgentStrike -> Cursor Cloud Agent --reads--> GitHub.
+The cloud agent writes the report, which goes to AgentStrike, then to you.
 A live-view branch drops from the cloud agent into the box browser.
-The report returns underneath, back to you.
 
 Rendered with rsvg-convert (librsvg), the same idea as the other Grok Bot
 repos: a real image in the README, not a Mermaid block.
@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT_SVG = ROOT / "assets" / "architecture.svg"
 OUT_PNG = ROOT / "assets" / "architecture.png"
 
-W, H = 1200, 720
+W, H = 1240, 760
 RED = "#E11D48"
 LINE = "#9AA0A6"
 PANEL = "#F7F8F9"
@@ -48,10 +48,10 @@ CURSOR_PATH = (
     "0 0 0-.295-.51l-9.11-5.257c-.109-.063-.064-.23.061-.23"
 )
 
-YOU_X, BOT_X, CLOUD_X, GH_X = 180, 460, 740, 1020
-MAIN_Y = 208
-BROWSER_Y = 408
-RETURN_Y = 592
+YOU_X, BOT_X, CLOUD_X, GH_X = 170, 450, 760, 1060
+MAIN_Y = 196
+BROWSER_Y = 448
+REPORT_Y = 640
 
 
 def arrow_defs() -> str:
@@ -69,6 +69,7 @@ def style() -> str:
     .name {{ font-size: 15px; font-weight: 700; }}
     .cap {{ font-size: 13px; fill: {MUTED}; }}
     .note {{ font-size: 13px; fill: {MUTED}; }}
+    .phase {{ font-size: 12.5px; fill: {MUTED}; }}
   </style>'''
 
 
@@ -157,26 +158,36 @@ def report_icon(x: float, y: float) -> str:
 
 
 def build() -> str:
-    cloud_r, node_r, report_r = 46, 36, 34
+    cloud_r, node_r, report_r = 46, 36, 32
+    phase_y = MAIN_Y + cloud_r + 26
+    # Left of the cloud agent, clear of the phase line and of the browser column.
+    channel_x = 610
+    deliver_y = MAIN_Y + node_r + 36
     parts = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="How AgentStrike works">',
         f'<rect width="{W}" height="{H}" fill="#FFFFFF"/>',
         arrow_defs(),
         style(),
-        f'<text class="title" x="{W / 2}" y="46" text-anchor="middle">How AgentStrike works</text>',
-        # Main flow. Arrow tips stop at the circle edges.
+        f'<text class="title" x="{W / 2}" y="44" text-anchor="middle">How AgentStrike works</text>',
+        # You -> AgentStrike -> Cursor Cloud Agent.
         line(YOU_X + node_r + 8, MAIN_Y, BOT_X - node_r - 10, MAIN_Y),
         line(BOT_X + node_r + 8, MAIN_Y, CLOUD_X - cloud_r - 10, MAIN_Y),
+        # One read-only arrow into GitHub.
         line(CLOUD_X + cloud_r + 8, MAIN_Y, GH_X - node_r - 10, MAIN_Y),
-        # Live view branches down from the cloud agent, clear of its label.
-        line(CLOUD_X, MAIN_Y + cloud_r + 8, CLOUD_X, BROWSER_Y - node_r - 10),
-        f'<text class="note" x="{CLOUD_X + 56}" y="{(MAIN_Y + cloud_r + BROWSER_Y - node_r) / 2 + 4}">Live view</text>',
-        # Report flows back underneath: down from GitHub, left into the report, then back up to you.
-        line(GH_X, MAIN_Y + node_r + 8, GH_X, RETURN_Y, head=False),
-        line(GH_X - 4, RETURN_Y, BOT_X + report_r + 14, RETURN_Y),
-        line(BOT_X - report_r - 10, RETURN_Y, YOU_X, RETURN_Y, head=False),
-        line(YOU_X, RETURN_Y - 4, YOU_X, MAIN_Y + node_r + 14),
-        f'<text class="note" x="{(GH_X + BOT_X) / 2 + 30}" y="{RETURN_Y - 18}" text-anchor="middle">Report flows back</text>',
+        f'<text class="note" x="{(CLOUD_X + cloud_r + GH_X - node_r) / 2}" y="{MAIN_Y - 14}" text-anchor="middle">reads</text>',
+        # Phase line sits under the cloud-agent circle. The live-view arrow starts below it.
+        f'<text class="phase" x="{CLOUD_X}" y="{phase_y}" text-anchor="middle">Recon · STRIDE/OWASP · Attack</text>',
+        line(CLOUD_X, phase_y + 12, CLOUD_X, BROWSER_Y - node_r - 10),
+        f'<text class="note" x="{CLOUD_X + 52}" y="{(phase_y + BROWSER_Y) / 2}">Live view</text>',
+        # Report: cloud agent -> report -> AgentStrike -> you. Not from GitHub.
+        line(CLOUD_X - 34, MAIN_Y + 34, channel_x, MAIN_Y + 34, head=False),
+        line(channel_x, MAIN_Y + 34, channel_x, REPORT_Y, head=False),
+        line(channel_x - 4, REPORT_Y, BOT_X + report_r + 12, REPORT_Y),
+        line(BOT_X, REPORT_Y - report_r - 8, BOT_X, MAIN_Y + node_r + 10),
+        # AgentStrike delivers the report to you, below the forward arrow.
+        line(BOT_X - 20, MAIN_Y + 30, BOT_X - 20, deliver_y, head=False),
+        line(BOT_X - 20, deliver_y, YOU_X + 24, deliver_y, head=False),
+        line(YOU_X + 24, deliver_y, YOU_X + 24, MAIN_Y + 27),
     ]
 
     nodes = [
@@ -194,13 +205,13 @@ def build() -> str:
 
     parts.append(disk(CLOUD_X, BROWSER_Y, node_r))
     parts.append(browser(CLOUD_X, BROWSER_Y))
-    parts.append(labels_below(CLOUD_X, BROWSER_Y, node_r, "Box browser", "Computer tab"))
-    parts.append(badge(CLOUD_X - node_r - 18, BROWSER_Y - 8, "5"))
+    parts.append(labels_below(CLOUD_X, BROWSER_Y, node_r, "Box browser", "Computer tab in Grok Bot"))
+    parts.append(badge(CLOUD_X + node_r + 16, BROWSER_Y - node_r + 8, "5"))
 
-    parts.append(disk(BOT_X, RETURN_Y, report_r))
-    parts.append(report_icon(BOT_X, RETURN_Y))
-    parts.append(labels_below(BOT_X, RETURN_Y, report_r, "Report", "Ranked findings"))
-    parts.append(badge(BOT_X + report_r + 16, RETURN_Y - report_r + 6, "6"))
+    parts.append(disk(BOT_X, REPORT_Y, report_r))
+    parts.append(report_icon(BOT_X, REPORT_Y))
+    parts.append(labels_below(BOT_X, REPORT_Y, report_r, "Report", "Ranked findings"))
+    parts.append(badge(BOT_X - report_r - 16, REPORT_Y - 4, "6"))
 
     parts.append("</svg>")
     return "\n".join(parts)
