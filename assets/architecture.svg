@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="760" viewBox="0 0 1240 760" role="img" aria-label="How AgentStrike works">
-<rect width="1240" height="760" fill="#FFFFFF"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="560" viewBox="0 0 1240 560" role="img" aria-label="How AgentStrike works">
+<rect width="1240" height="560" fill="#FFFFFF"/>
 <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
       <path d="M0 0 L10 5 L0 10 z" fill="#9AA0A6"/>
@@ -19,12 +19,12 @@
 <line x1="814" y1="196" x2="1014" y2="196" stroke="#9AA0A6" stroke-width="1.8" marker-end="url(#arrow)"/>
 <text class="note" x="915.0" y="182" text-anchor="middle">reads</text>
 <text class="phase" x="760" y="268" text-anchor="middle">Recon · STRIDE/OWASP · Attack</text>
-<line x1="760" y1="280" x2="760" y2="402" stroke="#9AA0A6" stroke-width="1.8" marker-end="url(#arrow)"/>
-<text class="note" x="812" y="358.0">Live view</text>
-<line x1="726" y1="230" x2="610" y2="230" stroke="#9AA0A6" stroke-width="1.8"/>
-<line x1="610" y1="230" x2="610" y2="640" stroke="#9AA0A6" stroke-width="1.8"/>
-<line x1="606" y1="640" x2="494" y2="640" stroke="#9AA0A6" stroke-width="1.8" marker-end="url(#arrow)"/>
-<line x1="450" y1="600" x2="450" y2="242" stroke="#9AA0A6" stroke-width="1.8" marker-end="url(#arrow)"/>
+<line x1="760" y1="280" x2="760" y2="384" stroke="#9AA0A6" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text class="note" x="812" y="349.0">Live view</text>
+<line x1="756" y1="238" x2="590" y2="238" stroke="#9AA0A6" stroke-width="1.8"/>
+<line x1="590" y1="238" x2="590" y2="430" stroke="#9AA0A6" stroke-width="1.8"/>
+<line x1="586" y1="430" x2="496" y2="430" stroke="#9AA0A6" stroke-width="1.8" marker-end="url(#arrow)"/>
+<line x1="450" y1="390" x2="450" y2="240" stroke="#9AA0A6" stroke-width="1.8" marker-end="url(#arrow)"/>
 <line x1="430" y1="226" x2="430" y2="268" stroke="#9AA0A6" stroke-width="1.8"/>
 <line x1="430" y1="268" x2="194" y2="268" stroke="#9AA0A6" stroke-width="1.8"/>
 <line x1="194" y1="268" x2="194" y2="223" stroke="#9AA0A6" stroke-width="1.8" marker-end="url(#arrow)"/>
@@ -52,8 +52,8 @@
 <g transform="translate(1060,196)"><g transform="translate(-17.00,-17.00) scale(1.4167)" fill="#181717"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></g></g>
 <text class="name" x="1060" y="120" text-anchor="middle">GitHub</text><text class="cap" x="1060" y="140" text-anchor="middle">Target repo</text>
 <circle cx="1022" cy="176" r="11" fill="#FFF4E8" stroke="#F3D5B0"/><text x="1022" y="180" text-anchor="middle" font-size="12" font-weight="700" fill="#C2410C">4</text>
-<circle cx="760" cy="448" r="36" fill="#F7F8F9" stroke="#E4E6EA" stroke-width="1.5"/>
-<g transform="translate(760,448)">
+<circle cx="760" cy="430" r="36" fill="#F7F8F9" stroke="#E4E6EA" stroke-width="1.5"/>
+<g transform="translate(760,430)">
     <rect x="-20" y="-15" width="40" height="30" rx="4" fill="#FFFFFF" stroke="#181717" stroke-width="1.6"/>
     <path d="M-20-8h40" stroke="#181717" stroke-width="1.4"/>
     <circle cx="-13" cy="-11.5" r="1.6" fill="#E11D48"/>
@@ -63,14 +63,14 @@
     <rect x="-13" y="2" width="24" height="2.2" rx="1" fill="#E5E7EB"/>
     <rect x="-13" y="7" width="14" height="2.2" rx="1" fill="#E5E7EB"/>
   </g>
-<text class="name" x="760" y="512" text-anchor="middle">Box browser</text><text class="cap" x="760" y="532" text-anchor="middle">Computer tab in Grok Bot</text>
-<circle cx="812" cy="420" r="11" fill="#FFF4E8" stroke="#F3D5B0"/><text x="812" y="424" text-anchor="middle" font-size="12" font-weight="700" fill="#C2410C">5</text>
-<circle cx="450" cy="640" r="32" fill="#F7F8F9" stroke="#E4E6EA" stroke-width="1.5"/>
-<g transform="translate(450,640)">
+<text class="name" x="760" y="494" text-anchor="middle">Box browser</text><text class="cap" x="760" y="514" text-anchor="middle">Computer tab in Grok Bot</text>
+<circle cx="812" cy="402" r="11" fill="#FFF4E8" stroke="#F3D5B0"/><text x="812" y="406" text-anchor="middle" font-size="12" font-weight="700" fill="#C2410C">5</text>
+<circle cx="450" cy="430" r="32" fill="#F7F8F9" stroke="#E4E6EA" stroke-width="1.5"/>
+<g transform="translate(450,430)">
     <path fill="#FFFFFF" stroke="#181717" stroke-width="1.6" d="M-13-17h17l9 9v26h-26z"/>
     <path fill="none" stroke="#181717" stroke-width="1.4" d="M4-17v9h9"/>
     <rect x="-11" y="-9" width="22" height="3.4" rx="1" fill="#E11D48"/><rect x="-11" y="-3" width="22" height="3.4" rx="1" fill="#F97316"/><rect x="-11" y="3" width="22" height="3.4" rx="1" fill="#EAB308"/><rect x="-11" y="9" width="22" height="3.4" rx="1" fill="#94A3B8"/>
   </g>
-<text class="name" x="450" y="700" text-anchor="middle">Report</text><text class="cap" x="450" y="720" text-anchor="middle">Ranked findings</text>
-<circle cx="402" cy="636" r="11" fill="#FFF4E8" stroke="#F3D5B0"/><text x="402" y="640" text-anchor="middle" font-size="12" font-weight="700" fill="#C2410C">6</text>
+<text class="name" x="450" y="490" text-anchor="middle">Report</text><text class="cap" x="450" y="510" text-anchor="middle">Ranked findings</text>
+<circle cx="402" cy="426" r="11" fill="#FFF4E8" stroke="#F3D5B0"/><text x="402" y="430" text-anchor="middle" font-size="12" font-weight="700" fill="#C2410C">6</text>
 </svg>

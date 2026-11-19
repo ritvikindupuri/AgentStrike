@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT_SVG = ROOT / "assets" / "architecture.svg"
 OUT_PNG = ROOT / "assets" / "architecture.png"
 
-W, H = 1240, 760
+W, H = 1240, 560
 RED = "#E11D48"
 LINE = "#9AA0A6"
 PANEL = "#F7F8F9"
@@ -50,8 +50,8 @@ CURSOR_PATH = (
 
 YOU_X, BOT_X, CLOUD_X, GH_X = 170, 450, 760, 1060
 MAIN_Y = 196
-BROWSER_Y = 448
-REPORT_Y = 640
+BROWSER_Y = 430
+REPORT_Y = 430
 
 
 def arrow_defs() -> str:
@@ -160,9 +160,12 @@ def report_icon(x: float, y: float) -> str:
 def build() -> str:
     cloud_r, node_r, report_r = 46, 36, 32
     phase_y = MAIN_Y + cloud_r + 26
-    # Left of the cloud agent, clear of the phase line and of the browser column.
-    channel_x = 610
     deliver_y = MAIN_Y + node_r + 36
+    # Starts inside the cloud circle's lower-left so the disk covers the end
+    # and the visible line leaves the bottom edge, left of the live-view stem.
+    rim_x, rim_y = 756, 238
+    # Drop in the gap between AgentStrike and the phase label, then into the report.
+    drop_x = 590
     parts = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="How AgentStrike works">',
         f'<rect width="{W}" height="{H}" fill="#FFFFFF"/>',
@@ -179,11 +182,11 @@ def build() -> str:
         f'<text class="phase" x="{CLOUD_X}" y="{phase_y}" text-anchor="middle">Recon · STRIDE/OWASP · Attack</text>',
         line(CLOUD_X, phase_y + 12, CLOUD_X, BROWSER_Y - node_r - 10),
         f'<text class="note" x="{CLOUD_X + 52}" y="{(phase_y + BROWSER_Y) / 2}">Live view</text>',
-        # Report: cloud agent -> report -> AgentStrike -> you. Not from GitHub.
-        line(CLOUD_X - 34, MAIN_Y + 34, channel_x, MAIN_Y + 34, head=False),
-        line(channel_x, MAIN_Y + 34, channel_x, REPORT_Y, head=False),
-        line(channel_x - 4, REPORT_Y, BOT_X + report_r + 12, REPORT_Y),
-        line(BOT_X, REPORT_Y - report_r - 8, BOT_X, MAIN_Y + node_r + 10),
+        # Cloud agent -> report, from the circle's bottom edge, then straight up to AgentStrike.
+        line(rim_x, rim_y, drop_x, rim_y, head=False),
+        line(drop_x, rim_y, drop_x, REPORT_Y, head=False),
+        line(drop_x - 4, REPORT_Y, BOT_X + report_r + 14, REPORT_Y),
+        line(BOT_X, REPORT_Y - report_r - 8, BOT_X, MAIN_Y + node_r + 8),
         # AgentStrike delivers the report to you, below the forward arrow.
         line(BOT_X - 20, MAIN_Y + 30, BOT_X - 20, deliver_y, head=False),
         line(BOT_X - 20, deliver_y, YOU_X + 24, deliver_y, head=False),
