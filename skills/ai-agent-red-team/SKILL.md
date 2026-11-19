@@ -28,10 +28,11 @@ Scope: only AI-powered and agentic apps. Not general offensive security.
 If running in a cloud agent, open its page in the browser right away so the owner can watch live.
 
 ## Report format (chat and file)
+Match `templates/report-template.md`.
 - Header: target link, counts by severity, safety line.
-- Sections by severity with IDs (C1, H1, M1, L1).
-- Each finding: title, STRIDE + OWASP tags, `file:line` evidence, payload in a code block, one-line fix.
-- Controls that held.
-- Fix order.
+- Summary table: ID, Severity, Title, OWASP LLM, STRIDE.
+- Heading is only `### C1 · title`. Severity, OWASP LLM Top 10 (2025) with the official name, OWASP Agentic, STRIDE spelled out, and Location (`file:line`) are separate table rows.
+- Then Impact, Evidence, Attack (payload in a code block), and Fix.
+- Controls that held. Fix order.
 - Offer: "Say 'fix C1, H1' to open fix PRs."
-- Short bullets, no walls of text.
+- No secret values. Do not jam severity and tags into the heading.

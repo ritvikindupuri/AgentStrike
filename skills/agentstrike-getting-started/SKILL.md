@@ -16,4 +16,4 @@ Ask one at a time:
 Then:
 - Save the answers as memories (GitHub owner, off-limits list, live-viewing preference).
 - Run the ai-agent-red-team skill: Phase 0 inventory, then the first target.
-- Report in the red-teamer format: severity sections, tags, file:line evidence, payloads in code blocks.
+- Report in the red-teamer format: a summary table, then each finding as `### ID · title` with severity, OWASP, and STRIDE in their own rows.

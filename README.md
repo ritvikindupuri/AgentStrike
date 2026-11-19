@@ -33,7 +33,7 @@ AgentStrike is a Grok Bot that red teams AI apps, agents, tool use, MCP, and RAG
 - **Read-only by default.** The review never writes to the repo.
 - **Opt-in fix PRs.** `fix C1, H1` opens a pull request per finding, or per severity group, and does not merge.
 - **Live view.** The Computer tab shows the cloud agent run and its commands.
-- **One report shape.** Ids, STRIDE and OWASP tags, `file:line`, payload, one-line fix, controls that held, fix order.
+- **One report shape.** Summary table, then `ID · title` with severity, OWASP, and STRIDE on their own rows.
 - **Shareable template.** Profile, four memories, two skills. No routines or plugins.
 
 ## System architecture
@@ -136,7 +136,7 @@ In the Grok Bot app, open AgentStrike's Computer tab. The box browser there show
 
 The chat gets the report. For a file: `Write the report to a markdown file in this chat.`
 
-Check the header counts, then each id (`C1`, `H1`, `M1`, `L1`): tags, `file:line`, payload, one-line fix. Reject a finding whose payload is not tied to that line. Keep controls that held. Follow the fix order unless two fixes share lines. A secret finding names a path only. If a value appears: `Redact that. Tell me the path only.`
+Check the summary table, then each finding. The heading is only the id and title, such as `H1 · A tool argument is taken from model output without an allowlist`. Severity, OWASP LLM Top 10 (2025), OWASP Agentic, STRIDE, and `file:line` are separate rows. Read Impact, Evidence, the payload, and Fix. Reject a finding whose payload is not tied to that location. Keep controls that held. Follow the fix order unless two fixes share lines. A secret finding names a path only. If a value appears: `Redact that. Tell me the path only.`
 
 [`templates/report-template.md`](templates/report-template.md) is the shape. Its findings are placeholders, not results.
 
