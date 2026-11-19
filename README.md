@@ -11,11 +11,12 @@
   <img alt="OWASP LLM Top 10" src="https://img.shields.io/badge/OWASP-LLM%20Top%2010-444">
   <img alt="OWASP Agentic" src="https://img.shields.io/badge/OWASP-Agentic-444">
   <img alt="Read-only by default" src="https://img.shields.io/badge/Read--only-by%20default-2a2a2a">
+  <a href="https://x.ai/bot/9sYr4S1elzD7-sCKfr6RO"><img alt="Get the bot" src="https://img.shields.io/badge/Get%20the%20bot-x.ai-444"></a>
 </p>
 
 ## Overview
 
-AgentStrike is a Grok Bot that red teams AI apps, agents, tool use, MCP, and RAG from their GitHub repos. It scores findings against STRIDE, the OWASP Top 10 for LLM Applications 2025, and OWASP Agentic threats. This repo is the recipe: open the Bot template link, or create the bot by hand from [`template/agentstrike-template.json`](template/agentstrike-template.json).
+AgentStrike is a Grok Bot that red teams AI apps, agents, tool use, MCP, and RAG from their GitHub repos. It scores findings against STRIDE, the OWASP Top 10 for LLM Applications 2025, and OWASP Agentic threats. This repo is the recipe: open the [Bot template link](https://x.ai/bot/9sYr4S1elzD7-sCKfr6RO), or create the bot by hand from [`template/agentstrike-template.json`](template/agentstrike-template.json).
 
 **Guardrails**
 
@@ -76,7 +77,7 @@ cd AgentStrike
 
 Grok Bot shares a Bot template link, not a JSON import. The JSON file is the recipe.
 
-Open the AgentStrike Bot template link if you have one. The getting-started skill runs on the first chat.
+[Open the AgentStrike Bot template](https://x.ai/bot/9sYr4S1elzD7-sCKfr6RO), and the getting-started skill runs on the first chat.
 
 Otherwise create the bot by hand:
 
