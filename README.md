@@ -64,35 +64,35 @@ AgentStrike is a Grok Bot that red teams AI apps, agents, tool use, MCP, and RAG
 
 ## Setup instructions
 
-You need a Grok Bot account, GitHub, and Cursor cloud agents. Nothing else to install.
+You need a Grok Bot account, GitHub, and Cursor cloud agents. Nothing to install or clone.
 
-### 1. Clone
+### 1. Get the bot
+
+Open the [AgentStrike Bot template](https://x.ai/bot/9sYr4S1elzD7-sCKfr6RO); the getting-started skill runs on the first chat.
+
+### 2. Connect GitHub
+
+Approve the connection card. Read access is enough for the review. Fix pull requests also need permission to push a branch and open a pull request.
+
+### 3. Cloud agents
+
+They must be available on the same account. AgentStrike launches the run. You do not start the first one yourself.
+
+### Optional: customize or build by hand
+
+Clone only if you want to edit skills or prompts, build the bot manually, or contribute.
 
 ```bash
 git clone https://github.com/ritvikindupuri/AgentStrike.git
 cd AgentStrike
 ```
 
-### 2. Create the bot
-
-Grok Bot shares a Bot template link, not a JSON import. The JSON file is the recipe.
-
-[Open the AgentStrike Bot template](https://x.ai/bot/9sYr4S1elzD7-sCKfr6RO), and the getting-started skill runs on the first chat.
-
-Otherwise create the bot by hand:
+Grok Bot shares a Bot template link, not a JSON import. The JSON file is the recipe. To build the bot by hand:
 
 1. Name it **AgentStrike** and paste the profile description from the JSON.
 2. Add the four memories: AI-only scope, report format, live view, lean usage.
 3. Add [`skills/ai-agent-red-team/SKILL.md`](skills/ai-agent-red-team/SKILL.md) and [`skills/agentstrike-getting-started/SKILL.md`](skills/agentstrike-getting-started/SKILL.md). The second one runs first.
 4. Leave routines and plugins empty.
-
-### 3. Connect GitHub
-
-Approve the connection card. Read access is enough for the review. Fix pull requests also need permission to push a branch and open a pull request.
-
-### 4. Cloud agents
-
-They must be available on the same account. AgentStrike launches the run. You do not start the first one yourself.
 
 | Path | What it is |
 |------|------------|
