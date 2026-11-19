@@ -1,10 +1,12 @@
 # <img src="assets/icon.svg" alt="" width="40"> AgentStrike
 
-**AI agent red team, read-only and local only.**
+**AI agent red team. The review is read-only. Fixes open a pull request only if you ask.**
 
 AgentStrike is a Grok Bot (an AI assistant built on the Grok Bot app, by Cursor) that red teams AI-powered and agentic applications from their GitHub repositories. It covers LLM apps, agents, tool use, MCP, and RAG, and it scores what it finds against STRIDE, the OWASP Top 10 for LLM Applications 2025, and OWASP Agentic threats (tool misuse, privilege compromise, memory poisoning, excessive agency).
 
-It does not do general offensive security. A run never commits, opens a pull request, or opens an issue on the target. It never calls a live deployment or any other external host, never uses real cloud credentials, and never prints a secret value. When a check needs a concrete payload, that payload is tied to a code path and checked by reading the code or with a local harness that stays inside the workspace.
+It does not do general offensive security. Phases 0 through 4, and the retest, never commit, open a pull request, or open an issue. They never call a live deployment or any other external host, never use real cloud credentials, and never print a secret value. When a check needs a concrete payload, that payload is tied to a code path and checked by reading the code or with a local harness that stays inside the workspace.
+
+After the report, you can say `fix C1, H1`. That opt-in Fix phase launches a cloud agent that opens a pull request on a new branch for each finding, or for a severity group. The diff is minimal, a regression test or local harness shows the payload now fails, and the finding id is in the pull request title. The agent never merges. You review, and Phase 5 retests against that branch.
 
 The bot launches one Cursor cloud agent on the repository you pick. In the Grok Bot app, open AgentStrike's Computer tab. The box browser there shows the cloud agent run page with its live commands. The bot returns a severity-ranked markdown report. Findings use ids such as C1, H1, M1, and L1, with STRIDE and OWASP tags, `file:line` evidence, the payload in a code block, and a one-line fix. The report also lists controls that held and a fix order.
 
@@ -13,8 +15,9 @@ This repository is the recipe for that bot: the profile, four memories, two skil
 ## Key features
 
 - **AI and agent scope only.** LLM apps, agents, tool use, MCP, and RAG. Other kinds of security work are out of scope.
-- **Six phases.** Inventory, recon, threat model, attack, verify and report, then retest after you fix the code.
-- **Read-only on the target.** No commits, pull requests, or issues. You merge your own fixes.
+- **Phases 0 through 5, plus an opt-in fix.** Inventory, recon, threat model, attack, report, then an optional fix, then retest.
+- **Read-only until you ask for a fix.** Phases 0 through 4, and the retest, do not commit, open a pull request, or open an issue. A fix pull request is opened only when you name the findings, and you merge it yourself.
+- **Opt-in fix PRs.** Say `fix C1, H1`. A cloud agent opens one pull request per finding, or per severity group, on a new branch. The title carries the finding id. The body states the finding, the root cause, the change, and how it was verified. The agent never merges.
 - **Local only.** No live hosts, no real cloud credentials, and secret values are never printed. The report names the file and line.
 - **One target at a time.** The cloud agent gets the known leads, so it does not re-read the whole tree.
 - **Live view.** In the Grok Bot app, open AgentStrike's Computer tab. The box browser there shows the cloud agent run page with its live commands.
@@ -26,20 +29,20 @@ This repository is the recipe for that bot: the profile, four memories, two skil
 <p align="center">
   <img src="assets/architecture.png" alt="How AgentStrike works" width="900">
 </p>
-You ask AgentStrike. The bot launches a Cursor cloud agent, the central step, drawn with the Cursor logo. That agent reads the GitHub repository. It writes the report and sends it to AgentStrike, and AgentStrike delivers it to you. AgentStrike opens the run in the box browser.
+You ask AgentStrike. The bot launches a Cursor cloud agent, the central step, drawn with the Cursor logo. That agent reads the GitHub repository. The solid arrow is that read. The dashed arrow is optional: it opens a fix pull request only if you ask. The agent writes the report and sends it to AgentStrike, and AgentStrike delivers it to you. AgentStrike opens the run in the box browser.
 
 1. **You** tell AgentStrike which GitHub owner to look at, or you name one AI or agent app.
 2. **AgentStrike**, the Grok Bot, keeps the work inside the AI-only scope, saves your answers, and launches a single read-only run with the known leads. The report comes back here, and AgentStrike delivers it to you.
-3. **Cursor Cloud Agent** is the central step. It receives the prompt in [`prompts/cloud-agent-redteam-prompt.md`](prompts/cloud-agent-redteam-prompt.md), stays read-only, and does recon, the STRIDE and OWASP threat model, and the attack checks. It writes the report.
-4. **GitHub** is the read-only target. The only connection is the arrow labeled “Reads the code.” The agent does not push, open a pull request, or open an issue.
+3. **Cursor Cloud Agent** is the central step. The review uses [`prompts/cloud-agent-redteam-prompt.md`](prompts/cloud-agent-redteam-prompt.md), stays read-only, and does recon, the STRIDE and OWASP threat model, and the attack checks. It writes the report. A fix, when you ask, uses [`prompts/cloud-agent-fix-prompt.md`](prompts/cloud-agent-fix-prompt.md).
+4. **GitHub** is the repository. The solid arrow labeled “Reads the code” is the read-only review. The dashed arrow labeled “Opens a fix PR (only if you ask)” is the only write, and only after you name the findings. The agent never merges.
 5. **Box browser** is the live-view branch off the cloud agent. AgentStrike opens the run there. In the Grok Bot app, open AgentStrike's Computer tab. The box browser there shows the cloud agent run page with its live commands.
-6. **Report** goes from the Cursor cloud agent to AgentStrike, then from AgentStrike to you. You get severity counts, tagged findings, evidence, payloads, fixes, controls that held, and a fix order. After you change the code, the same loop retests each id.
+6. **Report** goes from the Cursor cloud agent to AgentStrike, then from AgentStrike to you. You get severity counts, tagged findings, evidence, payloads, fixes, controls that held, and a fix order. The report ends with “Say 'fix C1, H1' to open fix PRs.” After a fix pull request exists, Phase 5 retests those ids on that branch.
 
 ## Tech stack
 
 - **Grok Bot app.** The bot profile, memories, skills, the getting-started skill, and the box browser.
-- **Cursor cloud agents.** One read-only run per target. The prompt they receive is in this repo.
-- **GitHub.** The inventory of your repositories, and the source the cloud agent reads.
+- **Cursor cloud agents.** One read-only run per target, and an optional fix run that opens pull requests and does not merge. Both prompts are in this repo.
+- **GitHub.** The inventory of your repositories, the source the cloud agent reads, and the pull requests the fix run opens.
 - **Box desktop browser.** In the Grok Bot app, AgentStrike's Computer tab shows this browser. The page in it is the cloud agent run, with its live commands.
 - **STRIDE.** Spoofing, tampering, repudiation, information disclosure, denial of service, elevation of privilege.
 - **OWASP Top 10 for LLM Applications 2025.** LLM01 Prompt Injection, LLM02 Sensitive Information Disclosure, LLM03 Supply Chain, LLM04 Data and Model Poisoning, LLM05 Improper Output Handling, LLM06 Excessive Agency, LLM07 System Prompt Leakage, LLM08 Vector and Embedding Weaknesses, LLM09 Misinformation, LLM10 Unbounded Consumption.
@@ -75,7 +78,7 @@ Otherwise, create a new bot by hand and add the memories and skills from this re
 
 ### 3. Connect GitHub
 
-Open the new bot’s chat and let the getting-started skill ask its first question, or ask it to connect GitHub. Approve the connection card when it appears, and grant access to the repositories you want inventoried. Read access is enough. The bot does not push to those repositories.
+Open the new bot’s chat and let the getting-started skill ask its first question, or ask it to connect GitHub. Approve the connection card when it appears, and grant access to the repositories you want inventoried. Read access is enough for the review. Opening fix pull requests later needs permission to push a branch and open a pull request. The bot still never merges.
 
 ### 4. Confirm cloud agents
 
@@ -86,9 +89,10 @@ Cursor cloud agents have to be available on the same account. You do not start o
 | Path | What it is |
 |------|------------|
 | `template/agentstrike-template.json` | Bot profile, memories, skills, getting-started skill. No routines or plugins. |
-| `skills/ai-agent-red-team/SKILL.md` | The six-phase workflow and the report rules. |
+| `skills/ai-agent-red-team/SKILL.md` | The workflow, including the opt-in Fix phase, and the report rules. |
 | `skills/agentstrike-getting-started/SKILL.md` | The first conversation. |
-| `prompts/cloud-agent-redteam-prompt.md` | The prompt the cloud agent runs under. |
+| `prompts/cloud-agent-redteam-prompt.md` | The read-only prompt the cloud agent runs under for the review and the retest. |
+| `prompts/cloud-agent-fix-prompt.md` | The opt-in prompt that opens fix pull requests. It never merges. |
 | `templates/report-template.md` | Empty report shape. Every finding in it is an example placeholder. |
 | `assets/icon.svg` and `assets/icon.png` | Official mark: a red rounded blob with two white eyes. |
 | `assets/architecture.svg` and `assets/architecture.png` | The figure above. |
@@ -148,15 +152,15 @@ Before the cloud agent starts, the bot should be able to tell you the leads it w
 
 ### 5. The cloud agent starts
 
-The bot launches one Cursor cloud agent with the prompt in [`prompts/cloud-agent-redteam-prompt.md`](prompts/cloud-agent-redteam-prompt.md). That prompt repeats the safety rules: no commits, pull requests, or issues; no live hosts; no real cloud credentials; never print a secret value.
+The bot launches one Cursor cloud agent with the prompt in [`prompts/cloud-agent-redteam-prompt.md`](prompts/cloud-agent-redteam-prompt.md). That prompt stays read-only: no commits, pull requests, or issues; no live hosts; no real cloud credentials; never print a secret value. A fix is a later run, with [`prompts/cloud-agent-fix-prompt.md`](prompts/cloud-agent-fix-prompt.md), and only if you name the findings.
 
-Phases on that run:
+Phases on the read-only run:
 
 1. **Recon.** Map LLM calls, prompts, tools, MCP servers, RAG sources, auth, and untrusted input. Cite `file:line`.
 2. **Threat model.** STRIDE, OWASP LLM01–LLM10 (2025), and the agentic tags where the path is an agent.
 3. **Attack.** Payloads tied to those code paths. Checked by reading the code, or with a local harness that does not use the network.
-4. **Report.** The markdown shape in [`templates/report-template.md`](templates/report-template.md).
-5. **Retest.** Only when you ask, and only for the ids you name.
+4. **Report.** The markdown shape in [`templates/report-template.md`](templates/report-template.md). It closes with “Say 'fix C1, H1' to open fix PRs.”
+5. **Retest.** Only when you ask, and only for the ids you name, against the fix pull request branch or the default branch after you merge.
 
 ### 6. Watch the Computer tab
 
@@ -183,25 +187,40 @@ Read it in this order:
 
 The file [`templates/report-template.md`](templates/report-template.md) shows the shape with placeholder findings only. Those placeholders are not results.
 
-### 8. Fix, then retest
+### 8. Open fix PRs (optional)
 
-AgentStrike does not edit the target. You change the code, review it, and merge it yourself.
+Skip this if you would rather edit the code yourself. The review that produced the report stays read-only.
+
+1. In AgentStrike's chat, name the findings. Example: `fix C1, H1`.
+   - One pull request per finding is the default.
+   - For one pull request that covers a severity group, say so: `fix C1 and H1 in one pull request.`
+2. AgentStrike launches a cloud agent with [`prompts/cloud-agent-fix-prompt.md`](prompts/cloud-agent-fix-prompt.md). In the Grok Bot app, open AgentStrike's Computer tab and watch the run. You should see a new branch, a small diff, and a test or local harness. You should not see a merge.
+3. Open the pull request on GitHub when the run returns the link. The title includes the finding id, for example `fix(C1): ...`.
+4. Review the diff. Confirm it is limited to that finding. Read the pull request body: finding, root cause, change, and verification. Run the test or harness locally if you want a second look. The payload from the report should now fail.
+5. Ask for a retest on that branch before you merge. Example: `Retest C1 and H1 on the fix pull request branch.`
+6. Merge the pull request yourself after the retest. AgentStrike does not merge.
+
+### 9. Fix, then retest
+
+You can also change the code yourself. Either way, you review and you merge.
 
 When the fixes are on the branch you want checked:
 
-`Retest C1, H1, and M1 on octocat/example-agent at the current default branch.`
+`Retest C1, H1, and M1 on octocat/example-agent at the fix pull request branch.`
 
-Phase 5 rechecks those ids only and marks each one **fixed** or **open**. It should not start a new hunt unless you ask. An open item keeps its id. A fixed item says what changed, with a new `file:line`.
+After you have merged, you can point the retest at the default branch instead.
 
-To retest everything from the last report: `Retest every open finding from the last report.`
+Phase 5 rechecks those ids only and marks each one **fixed** or **open**. It uses the read-only prompt. It should not start a new hunt unless you ask. An open item keeps its id. A fixed item says what changed, with a new `file:line`.
 
-### 9. Another target
+To retest everything from the last report: `Retest every open finding from the last report on the fix pull request branch.`
+
+### 10. Another target
 
 `Inventory again and pick the next AI app, skipping anything we already reported.`
 
 The off-limits list still applies. Live view still follows the preference you saved.
 
-### 10. Share the template
+### 11. Share the template
 
 In AgentStrike's chat, ask:
 
