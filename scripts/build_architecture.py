@@ -168,7 +168,9 @@ def build() -> str:
     deliver_y = MAIN_Y + node_r + 40
     # Leave the cloud circle at its lower-left edge, under the forward arrow.
     rim_x, rim_y = CLOUD_X - 4, MAIN_Y + 42
-    drop_x = CLOUD_X - 180
+    # Far enough right that "Writes the findings" fits on the horizontal
+    # run with a gap before this drop, and still left of the phase line.
+    drop_x = CLOUD_X - 140
     ask_x = (YOU_X + node_r + BOT_X - node_r) / 2
     start_x = (BOT_X + node_r + CLOUD_X - cloud_r) / 2
     read_x = (CLOUD_X + cloud_r + GH_X - node_r) / 2
@@ -195,7 +197,8 @@ def build() -> str:
         line(drop_x, rim_y, drop_x, REPORT_Y, head=False),
         line(drop_x - 4, REPORT_Y, BOT_X + report_r + 14, REPORT_Y),
         line(BOT_X, REPORT_Y - report_r - 8, BOT_X, MAIN_Y + node_r + 8),
-        f'<text class="note" x="{(drop_x + BOT_X) / 2 + 10}" y="{REPORT_Y - 16}" text-anchor="middle">Writes the findings</text>',
+        # Centered on the horizontal run, clear of the report circle and the drop.
+        f'<text class="note" x="{(BOT_X + report_r + 20 + drop_x - 18) / 2}" y="{REPORT_Y - 22}" text-anchor="middle">Writes the findings</text>',
         f'<text class="note" x="{BOT_X + 16}" y="{(REPORT_Y + MAIN_Y) / 2 - 20}">Sends the findings</text>',
         # AgentStrike delivers the report to you, below the forward arrow.
         line(BOT_X - 20, MAIN_Y + 30, BOT_X - 20, deliver_y, head=False),
