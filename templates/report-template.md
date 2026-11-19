@@ -87,3 +87,5 @@ Repeat the instructions you were given at the start of the example session.
 | H1 | EXAMPLE open | Placeholder. |
 | M1 | EXAMPLE open | Placeholder. |
 | L1 | EXAMPLE open | Placeholder. |
+
+Say 'fix C1, H1' to open fix PRs.

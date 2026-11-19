@@ -11,6 +11,7 @@ repos: a real image in the README, not a Mermaid block.
 """
 from __future__ import annotations
 
+import math
 import re
 import shutil
 import subprocess
@@ -20,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT_SVG = ROOT / "assets" / "architecture.svg"
 OUT_PNG = ROOT / "assets" / "architecture.png"
 
-W, H = 1380, 620
+W, H = 1500, 620
 RED = "#E11D48"
 LINE = "#9AA0A6"
 PANEL = "#F7F8F9"
@@ -49,7 +50,7 @@ CURSOR_PATH = (
     "0 0 0-.295-.51l-9.11-5.257c-.109-.063-.064-.23.061-.23"
 )
 
-YOU_X, BOT_X, CLOUD_X, GH_X = 200, 530, 880, 1200
+YOU_X, BOT_X, CLOUD_X, GH_X = 200, 530, 880, 1320
 MAIN_Y = 214
 BROWSER_Y = 500
 REPORT_Y = 500
@@ -100,11 +101,12 @@ def labels_below(x: float, y: float, r: float, name: str, cap: str) -> str:
     )
 
 
-def line(x1, y1, x2, y2, head: bool = True) -> str:
+def line(x1, y1, x2, y2, head: bool = True, dashed: bool = False) -> str:
     marker = ' marker-end="url(#arrow)"' if head else ""
+    dash = ' stroke-dasharray="6 5"' if dashed else ""
     return (
         f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{LINE}" '
-        f'stroke-width="1.8"{marker}/>'
+        f'stroke-width="1.8"{dash}{marker}/>'
     )
 
 
@@ -174,6 +176,10 @@ def build() -> str:
     ask_x = (YOU_X + node_r + BOT_X - node_r) / 2
     start_x = (BOT_X + node_r + CLOUD_X - cloud_r) / 2
     read_x = (CLOUD_X + cloud_r + GH_X - node_r) / 2
+    fix_y = MAIN_Y + 30
+    fix_dy = fix_y - MAIN_Y
+    fix_x1 = CLOUD_X + math.sqrt(cloud_r ** 2 - fix_dy ** 2) + 3
+    fix_x2 = GH_X - math.sqrt(node_r ** 2 - fix_dy ** 2) - 3
     parts = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="How AgentStrike works">',
         f'<rect width="{W}" height="{H}" fill="#FFFFFF"/>',
@@ -183,11 +189,14 @@ def build() -> str:
         # You -> AgentStrike -> Cursor Cloud Agent.
         line(YOU_X + node_r + 8, MAIN_Y, BOT_X - node_r - 10, MAIN_Y),
         line(BOT_X + node_r + 8, MAIN_Y, CLOUD_X - cloud_r - 10, MAIN_Y),
-        # One read-only arrow into GitHub.
+        # Solid read-only arrow, then a dashed opt-in fix arrow below it.
         line(CLOUD_X + cloud_r + 8, MAIN_Y, GH_X - node_r - 10, MAIN_Y),
+        line(fix_x1, fix_y, fix_x2, fix_y, dashed=True),
         f'<text class="note" x="{ask_x}" y="{MAIN_Y - 16}" text-anchor="middle">Asks for a review</text>',
         f'<text class="note" x="{start_x}" y="{MAIN_Y - 16}" text-anchor="middle">Starts the run</text>',
         f'<text class="note" x="{read_x}" y="{MAIN_Y - 16}" text-anchor="middle">Reads the code</text>',
+        # Sit the label under the dashes, clear of the phase line on the left.
+        f'<text class="note" x="{(fix_x1 + fix_x2) / 2 + 24}" y="{fix_y + 40}" text-anchor="middle">Opens a fix PR (only if you ask)</text>',
         # What the cloud agent checks, under the circle. Live view continues below that line.
         f'<text class="phase" x="{CLOUD_X}" y="{phase_y}" text-anchor="middle">Security checks: STRIDE + OWASP</text>',
         line(CLOUD_X, phase_y + 14, CLOUD_X, BROWSER_Y - node_r - 12),

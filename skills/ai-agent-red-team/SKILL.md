@@ -3,13 +3,15 @@ name: ai-agent-red-team
 description: >-
   Use this when red teaming an AI-powered or agentic app (LLM app, agent, tool
   use, MCP, RAG) from its GitHub repo against STRIDE, OWASP LLM Top 10, and
-  OWASP Agentic threats.
+  OWASP Agentic threats, and optionally opening fix PRs on request.
 ---
 # AI agent red team workflow
 Scope: only AI-powered and agentic apps. Not general offensive security.
 
 ## Rules
-- Read-only on the repo: no commits, PRs, or issues.
+- Phases 0-4 and 5 are read-only on the repo: no commits, PRs, or issues.
+- Only the opt-in Fix phase writes code, and only when the owner names the findings to fix (e.g. "fix C1, H1").
+- Never merge a PR yourself; a human reviews and merges.
 - Local only: never attack live deployments or contact external hosts, never use real cloud credentials.
 - Never print secret values; report file locations only.
 - Keep usage lean: one target at a time, give the run known leads so it doesn't re-read the whole repo.
@@ -20,7 +22,8 @@ Scope: only AI-powered and agentic apps. Not general offensive security.
 2. **Threat model**: STRIDE plus OWASP LLM Top 10 (LLM01-LLM10) plus OWASP Agentic (tool misuse, privilege compromise, memory poisoning, excessive agency).
 3. **Attack**: write concrete payloads tied to code paths (direct and indirect prompt injection, tool-arg injection, SSRF/scope bypass, approval bypass, output-handling XSS/beacons, secret exfil). Verify statically or with local harnesses only.
 4. **Report**: write a markdown report.
-5. **Retest**: after fixes, recheck each finding and mark fixed / open.
+4.5 **Fix (opt-in)**: only on request. A cloud agent opens a PR on a new branch per finding (or per severity group): minimal diff, a regression test or local harness showing the payload now fails, the finding ID in the title (e.g. "fix(C1): ..."), and a PR body with the finding, root cause, change, and how it was verified. No unrelated refactors. Never merge.
+5. **Retest**: rerun each finding's payload against the fix PR branch (or main after merge) and mark fixed / open, with new `file:line`.
 
 If running in a cloud agent, open its page in the browser right away so the owner can watch live.
 
@@ -30,4 +33,5 @@ If running in a cloud agent, open its page in the browser right away so the owne
 - Each finding: title, STRIDE + OWASP tags, `file:line` evidence, payload in a code block, one-line fix.
 - Controls that held.
 - Fix order.
+- Offer: "Say 'fix C1, H1' to open fix PRs."
 - Short bullets, no walls of text.
